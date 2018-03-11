@@ -1,0 +1,28 @@
+version: '2'
+
+services:
+
+    client:
+        build: src/client
+        image: client
+        networks:
+            - overlay
+        environment: 
+            - IN_DOCKER="InDocker"
+        ulimits:
+          nofile:
+              soft: 65536
+              hard: 65536
+
+    server:
+        build: src/server
+        image: server
+        networks:
+            - overlay
+        ulimits:
+          nofile:
+              soft: 65536
+              hard: 65536
+
+networks:
+  overlay:

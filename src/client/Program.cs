@@ -24,11 +24,12 @@ namespace Client
             Console.WriteLine($"HostIP: {hostIp}");
 
             var isInDockerVal = Environment.GetEnvironmentVariable("IN_DOCKER");
-            string clusterPath = "127.0.0.1";
+            string clusterPath = hostIp;
             if (!String.IsNullOrEmpty(isInDockerVal))
             {
                 clusterPath = GetHostIPAddress("server");
             }
+            Console.WriteLine($"ClusterPath: {clusterPath}");
 
             var hcon = @"akka {
                                 debug.unhandled = on

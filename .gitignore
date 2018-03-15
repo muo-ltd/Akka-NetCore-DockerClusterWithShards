@@ -242,3 +242,5 @@ _Pvt_Extensions
 #Rancher 
 rancher-env.sh
 build/rancherhaproxy/haproxy.cfg
+
+*.vscode

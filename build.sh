@@ -22,7 +22,7 @@ function buildAndPublishOne() {
     echoheading "Build and Publish: $DIR"
     dotnet restore
     dotnet build
-    dotnet publish
+    dotnet publish -c Release
     
     popd 
 }

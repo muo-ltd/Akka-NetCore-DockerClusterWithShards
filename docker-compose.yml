@@ -9,6 +9,8 @@ services:
             - overlay
         environment: 
             - IN_DOCKER="InDocker"
+        depends_on:
+            - "server"
 
     server:
         build: src/server

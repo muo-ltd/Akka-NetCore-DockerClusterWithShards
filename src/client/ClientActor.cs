@@ -12,6 +12,7 @@ namespace Client
 
         private readonly ILoggingAdapter _log = Context.GetLogger();
         private long _totalChars;
+        private int _totalMessages;
 
         private IActorRef _origonalActor; 
         public ClientActor()
@@ -37,8 +38,8 @@ namespace Client
         public void Handle(Server.TestEntity.StreamedDataResponse res)
         {
             _totalChars += res.SomeData.Length;
-
-            _log.Info($"Received {res.SomeData.Length} chars");
+            _totalMessages++;
+            _log.Info($"Received {res.SomeData.Length} chars from {_totalMessages} messages");
         }
 
         public void Handle(Server.TestEntity.StreamedDataComplete res)

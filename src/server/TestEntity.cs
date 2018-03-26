@@ -52,5 +52,10 @@ namespace Server
 
             _log.Info($"Sent {req.NoInstances} with {req.NoChars} in each");
         }
+
+        public static Props Props()
+        {
+            return Akka.Actor.Props.Create(() => new TestEntity());
+        }
     }
 }

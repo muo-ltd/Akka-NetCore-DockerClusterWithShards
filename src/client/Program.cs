@@ -6,7 +6,6 @@ using System.Net.Sockets;
 using System.Runtime.Loader;
 using System.Threading;
 using Akka.Actor;
-using Akka.Cluster.Sharding;
 using Akka.Configuration;
 using Server;
 
@@ -24,16 +23,13 @@ namespace Client
             Console.WriteLine($"HostIP: {hostIp}");
 
             var isInDockerVal = Environment.GetEnvironmentVariable("IN_DOCKER");
-            string clusterPath = hostIp;
-            if (!String.IsNullOrEmpty(isInDockerVal))
-            {
-                clusterPath = GetHostIPAddress("server");
-            }
+            string clusterPath = GetHostIPAddress("server");
+
             Console.WriteLine($"ClusterPath: {clusterPath}");
 
             var hcon = @"akka {
                                 actor {
-                                    provider = ""Akka.Cluster.ClusterActorRefProvider, Akka.Cluster"" 
+                                    provider = remote
                                 }
 
                                 remote {
@@ -43,35 +39,13 @@ namespace Client
                                         hostname = {hostIP}
                                     }
                                 }
-
-                                cluster {
-                                    allow-weakly-up-members = off
-                                    seed-nodes = [""{clusterAddresses}""]
-                                    roles = [client]
-
-                                    sharding {
-                                        role = sharding
-                                        remember-entities = false
-                                    }
-                                }
                             }";
 
             hcon = hcon.Replace("{hostIP}", hostIp);
-            hcon = hcon.Replace("{clusterAddresses}", $"akka.tcp://testsystem@{clusterPath}:4053");
-
-            Console.WriteLine($"Seed Address:{clusterPath}");
 
             _clusterSystem = ActorSystem.Create("testsystem", ConfigurationFactory.ParseString(hcon));
 
-            var clusterSharding = ClusterSharding.Get(_clusterSystem);
-
-            var proxy = clusterSharding.StartProxy(
-                typeName: "testregion",
-                role: "sharding",
-                messageExtractor: new MessageExtractor());
-
-
-            var clientActor = _clusterSystem.ActorOf(ClientActor.Props(), "network");
+            var clientActor = _clusterSystem.ActorOf(ClientActor.Props(clusterPath), "client");
             clientActor.Ask<ClientActor.DummyResponse>(new ClientActor.DummyRequest()).Wait();
 
             AssemblyLoadContext.Default.Unloading += (obj) => 

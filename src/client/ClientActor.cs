@@ -1,6 +1,5 @@
 using System;
 using Akka.Actor;
-using Akka.Cluster.Sharding;
 using Akka.Event;
 
 namespace Client
@@ -13,10 +12,13 @@ namespace Client
         private readonly ILoggingAdapter _log = Context.GetLogger();
         private long _totalChars;
         private int _totalMessages;
+        private string _remoteAddress;
 
         private IActorRef _origonalActor; 
-        public ClientActor()
+        public ClientActor(string remoteAddress)
         {
+            _remoteAddress = remoteAddress;
+
             Receive<DummyRequest>(x => Handle(x));
             Receive<Server.TestEntity.StreamedDataResponse>(x => Handle(x));
             Receive<Server.TestEntity.StreamedDataComplete>(x => Handle(x));
@@ -25,12 +27,12 @@ namespace Client
         public void Handle(DummyRequest req)
         {
             _origonalActor = Sender;
-            var shardRegion = ClusterSharding.Get(Context.System).ShardRegion("testregion");
+
+            var remoteActor = Context.ActorSelection($"akka.tcp://testsystem@{_remoteAddress}:4053/user/testactor");
 
             var message = new Server.TestEntity.StreamedDataRequest(1000, 100000);
-            var envelope = new Server.Envelope(1, message);
 
-            shardRegion.Tell(envelope);
+            remoteActor.Tell(message);
 
             _log.Info("Handled DummyRequest");
         }
@@ -48,9 +50,9 @@ namespace Client
             _origonalActor.Tell(new DummyResponse());
         }
 
-        public static Props Props()
+        public static Props Props(string remoteAddress)
         {
-            return Akka.Actor.Props.Create(() => new ClientActor());
+            return Akka.Actor.Props.Create(() => new ClientActor(remoteAddress));
         }
 
     }

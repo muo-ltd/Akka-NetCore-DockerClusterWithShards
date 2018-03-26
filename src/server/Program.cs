@@ -5,7 +5,6 @@ using System.Net.Sockets;
 using System.Runtime.Loader;
 using System.Threading;
 using Akka.Actor;
-using Akka.Cluster.Sharding;
 using Akka.Configuration;
 
 namespace Server
@@ -23,7 +22,7 @@ namespace Server
 
             var hcon = @"akka {                                
                                 actor {
-                                    provider = ""Akka.Cluster.ClusterActorRefProvider, Akka.Cluster"" 
+                                    provider = remote
                                 }
 
                                 remote {
@@ -33,33 +32,15 @@ namespace Server
                                         hostname = {hostIP}
                                     }
                                 }
-
-                                cluster {
-                                    allow-weakly-up-members = off
-                                    seed-nodes = [""{clusterAddresses}""]
-                                    roles = [server,sharding]
-
-                                    sharding {
-                                        role = sharding
-                                        remember-entities = false
-                                    }
-                                }
                             }";
 
             hcon = hcon.Replace("{hostIP}", hostIp);
-            hcon = hcon.Replace("{clusterAddresses}", $"akka.tcp://testsystem@{hostIp}:4053");
 
             Console.WriteLine($"Seed Address:{hostIp}");
 
             _clusterSystem = ActorSystem.Create("testsystem", ConfigurationFactory.ParseString(hcon));
 
-            var clusterSharding = ClusterSharding.Get(_clusterSystem);
-
-            clusterSharding.Start(
-                typeName: "testregion",
-                entityProps: Props.Create<TestEntity>(),
-                settings: ClusterShardingSettings.Create(_clusterSystem),
-                messageExtractor: new MessageExtractor());
+            _clusterSystem.ActorOf(TestEntity.Props(), "testactor");
 
             AssemblyLoadContext.Default.Unloading += (obj) => 
             {

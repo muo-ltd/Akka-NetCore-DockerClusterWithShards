@@ -41,7 +41,10 @@ namespace Client
         {
             _totalChars += res.SomeData.Length;
             _totalMessages++;
-            _log.Info($"Received {res.SomeData.Length} chars from {_totalMessages} messages");
+            if ( (_totalMessages % 1000) == 0)
+            {
+                _log.Info($"Received {res.SomeData.Length} chars from {_totalMessages} messages");
+            }
         }
 
         public void Handle(Server.TestEntity.StreamedDataComplete res)

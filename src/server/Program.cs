@@ -31,6 +31,7 @@ namespace Server
                                     dot-netty.tcp {
                                         port = 4053
                                         hostname = {hostIP}
+                                        enable-pooling = false
                                     }
                                 }
 

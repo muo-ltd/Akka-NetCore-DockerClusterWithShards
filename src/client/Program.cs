@@ -41,6 +41,7 @@ namespace Client
                                     dot-netty.tcp {
                                         port = 0
                                         hostname = {hostIP}
+                                        enable-pooling = false
                                     }
                                 }
 

@@ -19,11 +19,11 @@ namespace Client
             var hostname = Dns.GetHostName();
             Console.WriteLine($"Hostname: {hostname}");
 
-            var hostIp = "127.0.0.1";
+            var hostIp = GetHostIPAddress(hostname);
             Console.WriteLine($"HostIP: {hostIp}");
 
             var isInDockerVal = Environment.GetEnvironmentVariable("IN_DOCKER");
-            string clusterPath = "127.0.0.1";
+            string clusterPath = GetHostIPAddress("server");
 
             Console.WriteLine($"ClusterPath: {clusterPath}");
 

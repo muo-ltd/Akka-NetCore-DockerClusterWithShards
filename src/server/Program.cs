@@ -17,7 +17,7 @@ namespace Server
             var hostname = Dns.GetHostName();
             Console.WriteLine($"Hostname: {hostname}");
 
-            var hostIp = "127.0.0.1";
+            var hostIp = GetHostIPAddress(hostname);
             Console.WriteLine($"HostIP: {hostIp}");
 
             var hcon = @"akka {                                

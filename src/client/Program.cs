@@ -19,11 +19,11 @@ namespace Client
             var hostname = Dns.GetHostName();
             Console.WriteLine($"Hostname: {hostname}");
 
-            var hostIp = GetHostIPAddress(hostname);
+            var hostIp = "127.0.0.1";
             Console.WriteLine($"HostIP: {hostIp}");
 
             var isInDockerVal = Environment.GetEnvironmentVariable("IN_DOCKER");
-            string clusterPath = GetHostIPAddress("server");
+            string clusterPath = "127.0.0.1";
 
             Console.WriteLine($"ClusterPath: {clusterPath}");
 
@@ -37,6 +37,7 @@ namespace Client
                                     dot-netty.tcp {
                                         port = 0
                                         hostname = {hostIP}
+                                        enable-pooling = false
                                     }
                                 }
                             }";
